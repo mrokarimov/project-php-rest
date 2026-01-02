@@ -1,9 +1,7 @@
 <?php
 include "db.php";
 
-$sql = "SELECT month, value FROM sales_monthly";
-$stmt = $conn->query($sql);
-
+$stmt = $conn->query("SELECT month, value FROM sales_monthly");
 $data = $stmt->fetchAll();
 
 echo json_encode($data);
