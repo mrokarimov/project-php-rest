@@ -1,7 +1,10 @@
 <?php
-include "db.php";
+require_once __DIR__ . "/db.php";
 
-$sql = "SELECT category, value FROM product_categories";
-$stmt = $conn->query($sql);
+$stmt = $conn->query("
+    SELECT category, value
+    FROM product_categories
+    ORDER BY value DESC
+");
 
 echo json_encode($stmt->fetchAll());
