@@ -1,7 +1,10 @@
 <?php
-include "db.php";
+require_once "db.php";
 
-$stmt = $conn->query("SELECT month, value FROM sales_monthly");
-$data = $stmt->fetchAll();
+$stmt = $conn->query("
+    SELECT month, value
+    FROM sales_monthly
+    ORDER BY month
+");
 
-echo json_encode($data);
+echo json_encode($stmt->fetchAll());
