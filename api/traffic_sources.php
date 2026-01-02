@@ -1,7 +1,10 @@
 <?php
-include "db.php";
+require_once __DIR__ . "/db.php";
 
-$sql = "SELECT source, value FROM traffic_sources";
-$stmt = $conn->query($sql);
+$stmt = $conn->query("
+    SELECT source, value
+    FROM traffic_sources
+    ORDER BY value DESC
+");
 
 echo json_encode($stmt->fetchAll());
