@@ -13,17 +13,16 @@ function fetchApi($url) {
     return json_decode($res, true) ?? [];
 }
 
-/* ===================== BASE URL (RENDER) ===================== */
+/* ===================== BASE URL ===================== */
 $BASE = "https://project-php-rest.onrender.com/api";
 
 /* ===================== FETCH DATA ===================== */
-$salesData   = fetchApi("$BASE/sales_monthly.php");
-$userData    = fetchApi("$BASE/user_growth.php");
-$trafficData = fetchApi("$BASE/traffic_sources.php");
-$productData = fetchApi("$BASE/product_categories.php");
-
-/* currency vaqtincha OFF */
-$currencyData = [];
+$salesData    = fetchApi("$BASE/sales_monthly.php");
+$userData     = fetchApi("$BASE/user_growth.php");
+$trafficData  = fetchApi("$BASE/traffic_sources.php");
+$productData  = fetchApi("$BASE/product_categories.php");
+$currencyData = fetchApi("$BASE/currency_last20.php");
+$clapsData    = fetchApi("$BASE/get_claps.php");
 
 /* ===================== DATA PREP ===================== */
 $salesMonths = array_column($salesData,'month');
@@ -38,13 +37,18 @@ $trafficValues = array_map('intval',array_column($trafficData,'value'));
 $productLabels = array_column($productData,'category');
 $productValues = array_map('intval',array_column($productData,'value'));
 
+$currencyDates = array_column($currencyData,'date');
+$currencyRates = array_map('floatval',array_column($currencyData,'rate'));
+
+$currentClaps = $clapsData['claps'] ?? 0;
+
 /* ===================== KPI LOGIC ===================== */
 $salesDelta = count($salesValues) >= 2
-    ? $salesValues[count($salesValues)-1] - $salesValues[count($salesValues)-2]
+    ? end($salesValues) - prev($salesValues)
     : 0;
 
 $userDelta = count($userCounts) >= 2
-    ? $userCounts[count($userCounts)-1] - $userCounts[count($userCounts)-2]
+    ? end($userCounts) - prev($userCounts)
     : 0;
 
 $totalSales = array_sum($salesValues);
@@ -65,10 +69,22 @@ $lastUpdate = date("d M Y, H:i");
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280}
-body.dark{--bg:#0f172a;--card:#1e293b;--text:#e5e7eb;--muted:#9ca3af}
-body{background:var(--bg);color:var(--text);font-family:system-ui}
-.card{background:var(--card);border:none;border-radius:16px}
+:root{
+ --bg:#f5f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280
+}
+body.dark{
+ --bg:#0f172a;--card:#1e293b;--text:#e5e7eb;--muted:#9ca3af
+}
+body{
+ background:var(--bg);
+ color:var(--text);
+ font-family:system-ui
+}
+.card{
+ background:var(--card);
+ border:none;
+ border-radius:16px
+}
 .chart-box{height:320px}
 </style>
 </head>
@@ -113,9 +129,9 @@ Last updated: <?=$lastUpdate?>
 
 <div class="col-lg-3">
 <div class="card p-3 text-center shadow-sm">
-<small>Product Categories</small>
-<h4><?=count($productLabels)?></h4>
-<small>Top: <?=$topProduct?></small>
+<small>Claps</small>
+<h4 id="clapCount"><b><?=$currentClaps?></b></h4>
+<button class="btn btn-sm btn-outline-primary mt-2" onclick="addClap()">👏 Clap</button>
 </div>
 </div>
 </div>
@@ -149,6 +165,13 @@ Last updated: <?=$lastUpdate?>
 <div id="productChart" class="chart-box"></div>
 </div>
 </div>
+
+<div class="col-lg-12">
+<div class="card p-3">
+<strong>Currency Rate (Last 20)</strong>
+<div id="currencyChart" class="chart-box"></div>
+</div>
+</div>
 </div>
 
 </div>
@@ -158,7 +181,11 @@ Last updated: <?=$lastUpdate?>
 </footer>
 
 <script>
-const layout={paper_bgcolor:'transparent',plot_bgcolor:'transparent',margin:{t:30}};
+const layout={
+ paper_bgcolor:'transparent',
+ plot_bgcolor:'transparent',
+ margin:{t:30}
+};
 const cfg={displayModeBar:false,responsive:true};
 
 Plotly.newPlot('salesChart',[{
@@ -186,6 +213,22 @@ Plotly.newPlot('productChart',[{
  type:'pie',
  hole:.4
 }],layout,cfg);
+
+Plotly.newPlot('currencyChart',[{
+ x:<?=json_encode($currencyDates)?>,
+ y:<?=json_encode($currencyRates)?>,
+ type:'scatter',
+ mode:'lines+markers',
+ line:{shape:'spline'}
+}],layout,cfg);
+
+function addClap(){
+ fetch("<?=$BASE?>/add_clap.php")
+   .then(r=>r.json())
+   .then(d=>{
+     document.getElementById("clapCount").innerText=d.claps;
+   });
+}
 </script>
 
 </body>
