@@ -1,22 +1,23 @@
 <?php
-include 'db.php';
+require_once __DIR__ . "/db.php";
 
-$sql = "
-SELECT currency_code, rate, created_at
-FROM currency_quotes
-ORDER BY created_at DESC
-LIMIT 20
-";
+try {
+    $stmt = $conn->query("
+        SELECT
+            rate_date AS date,
+            rate
+        FROM currency_rates
+        ORDER BY rate_date DESC
+        LIMIT 20
+    ");
 
-$result = mysqli_query($conn, $sql);
+    $data = $stmt->fetchAll();
 
-$data = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $data[] = [
-        "currency" => $row["currency_code"],
-        "rate" => (float)$row["rate"],
-        "timestamp" => $row["created_at"]
-    ];
+    echo json_encode(array_reverse($data));
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        "error" => "Failed to fetch currency rates",
+        "details" => $e->getMessage()
+    ]);
 }
-
-echo json_encode($data);
