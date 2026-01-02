@@ -1,13 +1,9 @@
 <?php
-include 'db.php';
+include "db.php";
 
 $sql = "SELECT month, value FROM sales_monthly";
-$result = mysqli_query($conn, $sql);
+$stmt = $conn->query($sql);
 
-$data = [];
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $data[] = $row;
-}
+$data = $stmt->fetchAll();
 
 echo json_encode($data);
