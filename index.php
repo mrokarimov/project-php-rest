@@ -245,8 +245,7 @@ footer{
  class="btn btn-sm btn-outline-secondary position-fixed end-0 m-3"
  onclick="toggleTheme()">🌙 Dark</button>
     
-<button id="docBtn"
- class="btn btn-sm btn-outline-secondary position-fixed end-0 m-3"
+<button class="btn btn-sm btn-outline-primary"
     onclick="openDoc()">📘 Doc</button>   
 
 <div class="container py-5 flex-grow-1">
