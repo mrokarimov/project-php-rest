@@ -434,17 +434,31 @@ async function runApiTest(){
 
 /* ===================== CLAPS ===================== */
 async function loadClaps(){
- const r=await fetch(`${BASE_URL}/get_claps.php`);
- const j=await r.json();
- document.getElementById("clapCount").innerText=j.total;
+  const r = await fetch(`${BASE_URL}/get_claps.php`);
+  const j = await r.json();
+  document.getElementById("clapCount").innerText = j.claps;
 }
+
 
 async function addClap(){
- await fetch(`${BASE_URL}/add_clap.php`,{method:"POST"});
- loadClaps();
+  const box = document.querySelector(".clap-box");
+
+  // animation
+  const float = document.createElement("span");
+  float.className = "clap-float";
+  float.innerText = "+1";
+  box.appendChild(float);
+  setTimeout(() => float.remove(), 700);
+
+  // API call
+  const r = await fetch(`${BASE_URL}/add_clap.php`, {
+    method: "POST"
+  });
+
+  const j = await r.json();
+  document.getElementById("clapCount").innerText = j.claps;
 }
 
-loadClaps();
 </script>
 <script>
 /* ===================== CHART DRAW ===================== */
@@ -596,6 +610,8 @@ function syntaxHighlight(json){
 /* ===================== INIT ===================== */
 
 drawCharts();
+loadClaps();
+
 </script>
 
 </body>
