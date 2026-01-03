@@ -247,7 +247,7 @@ footer{
     onclick="toggleTheme()">🌙 Dark</button>
 
   <button class="btn btn-sm btn-outline-primary"
-    onclick="openDoc()">📘 Doc </button>
+    onclick="openDoc()">📘 Desc</button>
 </div>
 
 <div class="container py-5 flex-grow-1">
@@ -255,7 +255,7 @@ footer{
 <div class="text-center mb-4">
 <h2><b>Enterprise Analytics Dashboard</b></h2>
 <p class="text-muted">
-<b>REST APIs • PostgreSQL • Render</b><br>
+<b>Php • PostgreSQL • Render.com • Plotly API • NBP API</b><br>
 Last updated: <?=$lastUpdate?>
 </p>
 </div>
@@ -987,7 +987,7 @@ function toggleTheme(){
 
 if(localStorage.getItem('theme')==='dark'){
  document.body.classList.add('dark');
- document.getElementById('themeBtn').innerText='☀ Light';
+ document.getElementById('themeBtn').innerText='☀️ Light';
 }
 
 /* ===================== JSON SYNTAX ===================== */
