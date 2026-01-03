@@ -129,20 +129,14 @@ $lastUpdate = date("d M Y, H:i");
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <style>
+
+
 :root{
  --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280;
 }
 body.dark{
  --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --muted:#9ca3af;
 }
-body.dark #testResult{
-  background:#020617;
-}
-body:not(.dark) #testResult{
-  background:#f8fafc;
-  color:#020617;
-}
-
 body{
  background:var(--bg);
  color:var(--text);
@@ -151,26 +145,95 @@ body{
 }
 body, body *{color:var(--text)}
 .text-muted, small{color:var(--muted)!important}
+
 .card{background:var(--card);border:none;border-radius:16px}
-.chart-box{height:460px}
-footer{background:var(--card);border-top:1px solid rgba(0,0,0,.1)}
-.clap-box{
- display:inline-flex;
- align-items:center;
- gap:8px;
- padding:6px 14px;
- border-radius:999px;
- border:1px solid rgba(34,197,94,.6);
- color:#22c55e;
- cursor:pointer;
- user-select:none;
- font-size:14px;
+.chart-box{height:320px}
+
+.table, .table td, .table th{
+ color:var(--text)!important;
+ background:transparent!important
 }
-.json-brace { color:#22c55e; }   
-.json-string { color:#ef4444; }
-.json-number { color:#38bdf8; }
-.json-boolean { color:#facc15; }
-.json-null { color:#fb7185; }
+.table thead th{background:rgba(255,255,255,.06)!important}
+body:not(.dark) .table thead th{background:rgba(0,0,0,.04)!important}
+
+.modal-content,.modal-header,.modal-body{
+ background:var(--card)!important;
+ color:var(--text)!important
+}
+.btn-close{filter:invert(1)}
+body:not(.dark) .btn-close{filter:none}
+
+.table-striped>tbody>tr:nth-of-type(odd)>*{
+ background:rgba(255,255,255,.04)!important
+}
+body:not(.dark)
+.table-striped>tbody>tr:nth-of-type(odd)>*{
+ background:rgba(0,0,0,.03)!important
+}
+        
+.clap-float {
+  position: absolute;
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 14px;
+  pointer-events: none;
+  animation: clapFloat 700ms ease-out forwards;
+}
+
+@keyframes clapFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.9);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1.1);
+  }
+}
+        
+        
+.clap-box{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border-radius:999px;
+  border:1px solid rgba(34,197,94,.6);
+  color:#22c55e;
+  cursor:pointer;
+  user-select:none;
+  transition:all .2s ease;
+  font-size:14px;
+}
+
+.clap-box:hover{
+  background:rgba(34,197,94,.12);
+  transform:translateY(-1px);
+}
+
+.clap-icon{
+  font-size:16px;
+}
+
+.clap-count{
+  font-weight:600;
+}
+        
+
+footer{
+ background:var(--card);
+ border-top:1px solid rgba(0,0,0,.1)
+}
+
+/* JSON colors */
+.string{color:#22c55e}
+.number{color:#38bdf8}
+.boolean{color:#facc15}
+.null{color:#fb7185}
+.key{color:#e879f9}
 
     
 </style>
@@ -646,18 +709,27 @@ ${prettyJson(data)}
 
 
 function prettyJson(obj){
-  let json = JSON.stringify(obj, null, 2)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+  const json = JSON.stringify(obj, null, 2);
 
-  return json
-    .replace(/(\{|\}|\[|\])/g, '<span class="json-brace">$1</span>')
-    .replace(/"(.*?)"/g, '<span class="json-string">"$1"</span>')
-    .replace(/\b\d+(\.\d+)?\b/g, '<span class="json-number">$&</span>')
-    .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
-    .replace(/\bnull\b/g, '<span class="json-null">null</span>');
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
+    match => {
+      if (/^"/.test(match)) {
+        return /:$/.test(match)
+          ? `<span class="json-key">${match}</span>`
+          : `<span class="json-string">${match}</span>`;
+      }
+      if (/true|false/.test(match)) {
+        return `<span class="json-boolean">${match}</span>`;
+      }
+      if (/null/.test(match)) {
+        return `<span class="json-null">${match}</span>`;
+      }
+      return `<span class="json-number">${match}</span>`;
+    }
+  );
 }
+
 
 
 </script>
