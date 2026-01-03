@@ -494,18 +494,22 @@ foreach($charts as $c):
 <div class="modal-body">
 
 <div class="card p-3 mb-3">
-<strong>Test Case</strong>
-<pre id="testCaseText" class="mb-2"></pre>
-<hr>
-<small class="text-muted">
-<b>HTTP Method:</b> GET<br>
-<b>Endpoint:</b><br>
-<code id="testApiUrl"></code>
-</small>
+  <strong>API Endpoint</strong>
+
+  <input
+    id="apiInput"
+    class="form-control mt-2"
+    placeholder="Paste full API URL here (https://...)"
+  >
+
+  <small class="text-muted mt-2 d-block">
+    Example: https://project-php-rest.onrender.com/api/sales_monthly.php
+  </small>
 </div>
 
-<button class="btn btn-success mb-3" onclick="runApiTest()">▶ Run Test</button>
-
+<button class="btn btn-success mb-3" onclick="runApiTest()">
+  ▶ Run Tests
+</button>
 
 <div id="testResult"
      style="display:none;
@@ -516,6 +520,7 @@ foreach($charts as $c):
             font-family:monospace;
             white-space:pre">
 </div>
+
 
 </div>
 </div>
@@ -815,40 +820,103 @@ chfChart: {
 
 let currentTest=null;
 
-function openTestDialog(title,id){
- currentTest=testCases[id];
- document.getElementById("testTitle").innerText=title+" – API Tests";
- document.getElementById("testApiUrl").innerText=currentTest.api;
- document.getElementById("testCaseText").innerText=
-  currentTest.tests.map((t,i)=>`${i+1}. ${t.name}`).join("\n");
- document.getElementById("testResult").style.display="none";
- new bootstrap.Modal(document.getElementById("testModal")).show();
+function openTestDialog(title, id) {
+  currentTest = testCases[id];
+
+  document.getElementById("testTitle").innerText =
+    title + " – API Tests";
+
+  document.getElementById("apiInput").value =
+    currentTest.api;
+
+  document.getElementById("testResult").style.display = "none";
+
+  new bootstrap.Modal(
+    document.getElementById("testModal")
+  ).show();
 }
 
-async function runApiTest(){
-  const box = document.getElementById('testResult');
-  box.style.display = 'block';
-  box.innerHTML = "Running tests...\n\n";
 
-  const res = await fetch(currentTest.api);
-  const data = await res.json();
+async function runApiTest() {
+  const box = document.getElementById("testResult");
+  const url = document.getElementById("apiInput").value.trim();
+
+  box.style.display = "block";
+  box.innerHTML = "⏳ Validating URL...\n\n";
+
+  /* URL validation */
+  if (!url.startsWith("http")) {
+    box.innerHTML =
+      "❌ Invalid URL\n\n" +
+      "Please provide a full valid API URL.";
+    return;
+  }
+
+  let response, data;
+
+  try {
+    response = await fetch(url);
+  } catch (e) {
+    box.innerHTML =
+      "❌ Network error\n\n" +
+      e.message;
+    return;
+  }
+
+  if (!response.ok) {
+    box.innerHTML =
+      `❌ HTTP Error: ${response.status}\n\n` +
+      response.statusText;
+    return;
+  }
+
+  try {
+    data = await response.json();
+  } catch (e) {
+    box.innerHTML =
+      "❌ Response is not valid JSON\n\n" +
+      e.message;
+    return;
+  }
+
+  box.innerHTML = "🔍 Running tests...\n\n";
 
   let passed = 0;
 
-  currentTest.tests.forEach((t, i) => {
-    const ok = t.check(res, data);
-    if(ok) passed++;
-    box.innerHTML += `${ok ? "✅" : "❌"} Test ${i+1}: ${t.name}\n`;
-  });
+  for (let i = 0; i < currentTest.tests.length; i++) {
+    const t = currentTest.tests[i];
 
-  box.innerHTML += `
-\nSummary:
-${passed} / ${currentTest.tests.length} tests passed
+    box.innerHTML += `⏳ Test ${i + 1}: ${t.name}\n`;
+    await new Promise(r => setTimeout(r, 500));
 
---- JSON Preview ---
-${prettyJson(data)}
-`;
+    let ok = false;
+    try {
+      ok = t.check(response, data);
+    } catch (e) {
+      ok = false;
+    }
+
+    if (ok) {
+      passed++;
+      box.innerHTML += `✅ Test ${i + 1} passed\n\n`;
+    } else {
+      box.innerHTML += `❌ Test ${i + 1} failed\n\n`;
+    }
+  }
+
+  box.innerHTML +=
+    `\nSummary:\n${passed} / ${currentTest.tests.length} tests passed\n`;
+
+  if (passed === currentTest.tests.length) {
+    box.innerHTML +=
+      "\n--- JSON Preview ---\n" +
+      prettyJson(data);
+  } else {
+    box.innerHTML +=
+      "\n⚠ JSON preview hidden due to failed tests.";
+  }
 }
+
 
 
 function prettyJson(obj) {
