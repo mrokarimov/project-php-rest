@@ -491,7 +491,7 @@ foreach($charts as $c):
 
       <div class="modal-body">
         <!-- Google Drive PDF Viewer -->
-        <iframe src="https://drive.google.com/file/d/1zN9nyYoWOTNgyreIYPZ1J3vk5U0zDbZ4/view?usp=sharing" width="100%" height="800px"></iframe>
+        <iframe src="https://drive.google.com/file/d/1zN9nyYoWOTNgyreIYPZ1J3vk5U0zDbZ/preview" width="100%" height="800px"></iframe>
       </div>
 
     </div>
