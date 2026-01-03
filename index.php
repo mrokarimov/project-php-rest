@@ -484,9 +484,15 @@ foreach($charts as $c):
 
 <button class="btn btn-success mb-3" onclick="runApiTest()">▶ Run Test</button>
 
+
 <div id="testResult"
- style="display:none;background:#0b1220;color:#e5e7eb;
- padding:16px;border-radius:12px;font-family:monospace;white-space:pre">
+     style="display:none;
+            background:#0b1220;
+            color:#e5e7eb;
+            padding:16px;
+            border-radius:12px;
+            font-family:monospace;
+            white-space:pre">
 </div>
 
 </div>
