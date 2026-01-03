@@ -272,7 +272,7 @@ footer{
     onclick="openDoc()">📘 Desc</button>
 
   <button class="btn btn-sm btn-outline-primary"
-      onclick="openSlide()">📘 Documentation</button>
+      onclick="openSlide()">🎞️ Slide</button>
 
 </div>
 
@@ -491,7 +491,7 @@ foreach($charts as $c):
 
       <div class="modal-body">
         <!-- Google Drive PDF Viewer -->
-        <iframe src="https://drive.google.com/file/d/1zN9nyYoWOTNgyreIYPZ1J3vk5U0zDbZ4/preview" width="100%" height="600px"></iframe>
+        <iframe src="https://drive.google.com/file/d/1zN9nyYoWOTNgyreIYPZ1J3vk5U0zDbZ4/view?usp=sharing" width="100%" height="800px"></iframe>
       </div>
 
     </div>
