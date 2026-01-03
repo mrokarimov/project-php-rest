@@ -887,7 +887,7 @@ async function runApiTest() {
     const t = currentTest.tests[i];
 
     box.innerHTML += `⏳ Test ${i + 1}: ${t.name}\n`;
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 900));
 
     let ok = false;
     try {
