@@ -215,30 +215,20 @@ Last updated: <?=$lastUpdate?>
 
 </div>
 
-<!-- ===== CURRENCY CHART ===== -->
-<div class="row mb-5">
-<div class="col-lg-12">
-<div class="card p-3 shadow-sm">
-<div class="d-flex justify-content-between mb-2">
-<strong>Currency Exchange – Last 20</strong>
-<button class="btn btn-sm btn-outline-primary"
- data-bs-toggle="modal"
- data-bs-target="#currencyModal">Show table</button>
-</div>
-<div id="currencyChart" class="chart-box"></div>
-</div>
-</div>
-</div>
-<!-- ===== 4 MAIN CHARTS ===== -->
+    
+<!-- ===== 6 MAIN CHARTS ===== -->
 <div class="row g-4">
 
 <?php
 $charts = [
+  ["usdChart","USD → PLN (last 20)","usdModal",$usd['rates'] ?? []],
+  ["chfChart","CHF → PLN (last 20)","chfModal",$chf['rates'] ?? []],
   ["salesChart","Monthly Sales","salesModal",$salesData],
   ["userChart","User Growth","userModal",$userData],
   ["trafficChart","Traffic Sources","trafficModal",$trafficData],
   ["productChart","Product Categories","productModal",$productData]
 ];
+
 foreach($charts as $c):
 ?>
 <div class="col-lg-6">
@@ -685,34 +675,32 @@ function drawCharts(){
   cfg
  );
 
- /* CURRENCY */
-Plotly.newPlot('currencyChart', [
-  {
+/* ===================== USD ===================== */
+Plotly.newPlot(
+  'usdChart',
+  [{
     x: <?= json_encode($usdTimes) ?>,
     y: <?= json_encode($usdRates) ?>,
     mode: 'lines+markers',
-    name: 'USD → PLN',
-    line: { width: 3 }
-  },
-  {
+    line: { width: 3, color: '#2563eb' }
+  }],
+  layout,
+  cfg
+);
+
+/* ===================== CHF ===================== */
+Plotly.newPlot(
+  'chfChart',
+  [{
     x: <?= json_encode($chfTimes) ?>,
     y: <?= json_encode($chfRates) ?>,
     mode: 'lines+markers',
-    name: 'CHF → PLN',
-    line: { width: 3 }
-  }
-], {
-  paper_bgcolor: 'transparent',
-  plot_bgcolor: 'transparent',
-  margin: { t: 50 },
-  yaxis: {
-    autorange: true,
-    fixedrange: false
-  }
-}, {
-  displayModeBar: false,
-  responsive: true
-});
+    line: { width: 3, color: '#16a34a' }
+  }],
+  layout,
+  cfg
+);
+
 
 }
 
