@@ -270,6 +270,10 @@ footer{
 
   <button class="btn btn-sm btn-outline-primary"
     onclick="openDoc()">📘 Desc</button>
+
+  <button class="btn btn-sm btn-outline-primary"
+      onclick="openSlide()">📘 Documentation</button>
+
 </div>
 
 <div class="container py-5 flex-grow-1">
@@ -474,6 +478,25 @@ foreach($charts as $c):
     </div>
   </div>
 </div>
+
+    <!-- Slide Modal -->
+<div class="modal fade" id="slideModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Slide Presentation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Google Drive PDF Viewer -->
+        <iframe src="https://drive.google.com/file/d/1zN9nyYoWOTNgyreIYPZ1J3vk5U0zDbZ4/preview" width="100%" height="600px"></iframe>
+      </div>
+
+    </div>
+  </div>
+</div>
     
 
 <!-- ===== API TEST MODAL ===== -->
@@ -589,6 +612,12 @@ foreach($charts as $c):
 </div>
 </div>
 </div>
+
+<script>
+  function openSlide() {
+    new bootstrap.Modal(document.getElementById('slideModal')).show();
+  }
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
