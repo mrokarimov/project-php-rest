@@ -612,7 +612,7 @@ async function addClap(){
   const j = await r.json();
   document.getElementById("clapCount").innerText = j.claps;
 }
-
+loadClaps();
 </script>
 <script>
 /* ===================== CHART DRAW ===================== */
@@ -715,7 +715,7 @@ Plotly.newPlot('currencyChart', [
   responsive: true
 });
 
-
+}
 
 /* ===================== THEME ===================== */
 
@@ -754,8 +754,6 @@ function syntaxHighlight(json){
 /* ===================== INIT ===================== */
 
 drawCharts();
-loadClaps();
-
 </script>
 
 </body>
