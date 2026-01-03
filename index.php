@@ -244,6 +244,10 @@ footer{
 <button id="themeBtn"
  class="btn btn-sm btn-outline-secondary position-fixed end-0 m-3"
  onclick="toggleTheme()">🌙 Dark</button>
+    
+<button id="docBtn"
+ class="btn btn-sm btn-outline-secondary position-fixed end-0 m-3"
+    onclick="openDoc()">📘 Doc</button>   
 
 <div class="container py-5 flex-grow-1">
 
@@ -343,6 +347,116 @@ foreach($charts as $c):
     <span class="clap-count" id="clapCount">0</span>
   </div>
 </footer>
+
+<div class="modal fade" id="docModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">📘 Project Documentation</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- AUTHOR -->
+        <section class="mb-4">
+          <h6>👤 Author</h6>
+          <p>
+            <b>Ozodbek Karimov</b><br>
+            Student ID: <b>69019</b><br>
+            Role: <b>Software Engineer (PHP / REST / Analytics)</b>
+          </p>
+        </section>
+
+        <!-- PROJECT -->
+        <section class="mb-4">
+          <h6>📊 Project Overview</h6>
+          <p>
+            This project is an <b>Enterprise Analytics Dashboard</b> built with
+            <b>PHP, REST APIs, PostgreSQL and Plotly.js</b>.
+            It demonstrates real-world backend/frontend integration,
+            API testing, data visualization, and production-ready UI patterns.
+          </p>
+        </section>
+
+        <!-- ARCH -->
+        <section class="mb-4">
+          <h6>🏗 Architecture</h6>
+          <ul>
+            <li><b>Frontend:</b> PHP + Bootstrap 5 + Plotly.js</li>
+            <li><b>Backend:</b> REST APIs (PHP)</li>
+            <li><b>Database:</b> PostgreSQL</li>
+            <li><b>Hosting:</b> Render.com</li>
+            <li><b>External API:</b> NBP (National Bank of Poland)</li>
+          </ul>
+        </section>
+
+        <!-- API LIST -->
+        <section class="mb-4">
+          <h6>🔌 REST API Endpoints</h6>
+          <ul>
+            <li><code>/api/sales_monthly.php</code> – monthly sales statistics</li>
+            <li><code>/api/user_growth.php</code> – daily user growth</li>
+            <li><code>/api/traffic_sources.php</code> – traffic distribution</li>
+            <li><code>/api/product_categories.php</code> – product categories</li>
+            <li><code>/api/get_claps.php</code> – clap counter (read)</li>
+            <li><code>/api/add_clap.php</code> – clap increment (write)</li>
+            <li><code>NBP API</code> – USD / CHF exchange rates</li>
+          </ul>
+        </section>
+
+        <!-- FILES -->
+        <section class="mb-4">
+          <h6>📁 Key Files</h6>
+          <ul>
+            <li><b>index.php</b> – main dashboard, UI, charts, tests, dark mode</li>
+            <li><b>db.php</b> – database connection (PDO)</li>
+            <li><b>api/*.php</b> – REST endpoints returning JSON</li>
+          </ul>
+        </section>
+
+        <!-- TESTING -->
+        <section class="mb-4">
+          <h6>🧪 API Testing</h6>
+          <p>
+            Each API endpoint includes <b>4 industry-level test cases</b>:
+          </p>
+          <ul>
+            <li>HTTP status validation</li>
+            <li>JSON schema validation</li>
+            <li>Business rules validation</li>
+            <li>Data sanity checks</li>
+          </ul>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="mb-4">
+          <h6>✨ Key Features</h6>
+          <ul>
+            <li>Dark / Light mode (persistent)</li>
+            <li>Interactive charts (Plotly)</li>
+            <li>Live API testing UI</li>
+            <li>Clap interaction system</li>
+            <li>Currency analytics (USD / CHF)</li>
+          </ul>
+        </section>
+
+        <!-- PURPOSE -->
+        <section>
+          <h6>🎯 Academic Purpose</h6>
+          <p>
+            This project demonstrates practical knowledge of
+            <b>RESTful systems, analytics dashboards, testing strategies,
+            and production-oriented UI design</b>.
+          </p>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+    
 
 <!-- ===== API TEST MODAL ===== -->
 <div class="modal fade" id="testModal" tabindex="-1">
@@ -731,6 +845,13 @@ function prettyJson(obj){
 }
 
 
+    
+function openDoc(){
+  new bootstrap.Modal(document.getElementById("docModal")).show();
+}
+
+
+
 
 </script>
 
@@ -859,7 +980,7 @@ Plotly.newPlot(
 function toggleTheme(){
  const dark=document.body.classList.toggle('dark');
  localStorage.setItem('theme',dark?'dark':'light');
- document.getElementById('themeBtn').innerText=dark?'☀ Light':'🌙 Dark';
+ document.getElementById('themeBtn').innerText=dark?'☀️ Light':'🌙 Dark';
  drawCharts();
 }
 
