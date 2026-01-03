@@ -50,28 +50,34 @@ $trafficValues = array_map('intval',array_column($trafficData,'value'));
 $productLabels = array_column($productData,'category');
 $productValues = array_map('intval',array_column($productData,'value'));
 
+/* ===================== CURRENCY PREP (SAFE) ===================== */
+
+$usdRates = [];
+$usdTimes = [];
+$chfRates = [];
+$chfTimes = [];
+
+if (is_array($usd['rates'] ?? null)) {
+    $usdRates = array_column($usd['rates'], 'mid');
+    $usdTimes = array_column($usd['rates'], 'effectiveDate');
+}
+
+if (is_array($chf['rates'] ?? null)) {
+    $chfRates = array_column($chf['rates'], 'mid');
+    $chfTimes = array_column($chf['rates'], 'effectiveDate');
+}
+
+/* Merge for Y-axis scaling */
+$allRates = array_merge($usdRates, $chfRates);
+
+/* Fallback to avoid fatal error */
+if (empty($allRates)) {
+    $allRates = [0];
+}
+
 $yMin = min($allRates) - 0.01;
 $yMax = max($allRates) + 0.01;
 
-
-/* ===================== CURRENCY PREP ===================== */
-$usdRates = is_array($usd['rates'] ?? null)
-    ? array_column($usd['rates'], 'mid')
-    : [];
-
-$usdTimes = is_array($usd['rates'] ?? null)
-    ? array_column($usd['rates'], 'effectiveDate')
-    : [];
-
-$chfRates = is_array($chf['rates'] ?? null)
-    ? array_column($chf['rates'], 'mid')
-    : [];
-
-$chfTimes = is_array($chf['rates'] ?? null)
-    ? array_column($chf['rates'], 'effectiveDate')
-    : [];
-
-$allRates = array_merge($usdRates, $chfRates);
 
 
 /* ===================== CURRENCY TABLE ===================== */
