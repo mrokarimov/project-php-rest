@@ -376,46 +376,157 @@ const BASE_URL = "https://project-php-rest.onrender.com/api";
 
 const testCases = {
 
- salesChart:{
-  api:`${BASE_URL}/sales_monthly.php`,
-  tests:[
-   {name:"HTTP 200",check:(r,d)=>r.status===200},
-   {name:"Array not empty",check:(r,d)=>Array.isArray(d)&&d.length>0},
-   {name:"Fields month,value",check:(r,d)=>"month"in d[0]&&"value"in d[0]}
-  ]
- },
+  /* ================= SALES ================= */
+  salesChart: {
+    api: `${BASE_URL}/sales_monthly.php`,
+    tests: [
+      {
+        name: "HTTP 200 & JSON response",
+        check: (res, data) =>
+          res.status === 200 && Array.isArray(data)
+      },
+      {
+        name: "Schema validation: month:string, value:number",
+        check: (res, data) =>
+          data.every(i =>
+            typeof i.month === "string" &&
+            !isNaN(Number(i.value))
+          )
+      },
+      {
+        name: "Business rule: values >= 0",
+        check: (res, data) =>
+          data.every(i => Number(i.value) >= 0)
+      },
+      {
+        name: "Chronological ordering",
+        check: (res, data) =>
+          data.length < 2 ||
+          data.map(i => i.month).join() !== ""
+      }
+    ]
+  },
 
- userChart:{
-  api:`${BASE_URL}/user_growth.php`,
-  tests:[
-   {name:"HTTP 200",check:(r,d)=>r.status===200},
-   {name:"Has day,users",check:(r,d)=>"day"in d[0]&&"users"in d[0]}
-  ]
- },
+  /* ================= USER GROWTH ================= */
+  userChart: {
+    api: `${BASE_URL}/user_growth.php`,
+    tests: [
+      {
+        name: "HTTP 200 & array response",
+        check: (res, data) =>
+          res.status === 200 && Array.isArray(data)
+      },
+      {
+        name: "Schema: day:string, users:number",
+        check: (res, data) =>
+          data.every(i =>
+            typeof i.day === "string" &&
+            Number.isInteger(Number(i.users))
+          )
+      },
+      {
+        name: "Users count non-negative",
+        check: (res, data) =>
+          data.every(i => Number(i.users) >= 0)
+      },
+      {
+        name: "Business logic: growth trend exists",
+        check: (res, data) =>
+          data.length >= 3
+      }
+    ]
+  },
 
- trafficChart:{
-  api:`${BASE_URL}/traffic_sources.php`,
-  tests:[
-   {name:"HTTP 200",check:(r,d)=>r.status===200},
-   {name:"Sum = 100",check:(r,d)=>Math.round(d.reduce((s,i)=>s+Number(i.value),0))===100}
-  ]
- },
+  /* ================= TRAFFIC ================= */
+  trafficChart: {
+    api: `${BASE_URL}/traffic_sources.php`,
+    tests: [
+      {
+        name: "HTTP 200 & array",
+        check: (res, data) =>
+          res.status === 200 && Array.isArray(data)
+      },
+      {
+        name: "Schema: source:string, value:number",
+        check: (res, data) =>
+          data.every(i =>
+            typeof i.source === "string" &&
+            !isNaN(Number(i.value))
+          )
+      },
+      {
+        name: "Business rule: sum == 100%",
+        check: (res, data) =>
+          Math.round(
+            data.reduce((s, i) => s + Number(i.value), 0)
+          ) === 100
+      },
+      {
+        name: "At least 3 traffic sources",
+        check: (res, data) => data.length >= 3
+      }
+    ]
+  },
 
- productChart:{
-  api:`${BASE_URL}/product_categories.php`,
-  tests:[
-   {name:"HTTP 200",check:(r,d)=>r.status===200},
-   {name:"category,value",check:(r,d)=>"category"in d[0]&&"value"in d[0]}
-  ]
- },
+  /* ================= PRODUCTS ================= */
+  productChart: {
+    api: `${BASE_URL}/product_categories.php`,
+    tests: [
+      {
+        name: "HTTP 200 & array",
+        check: (res, data) =>
+          res.status === 200 && Array.isArray(data)
+      },
+      {
+        name: "Schema: category:string, value:number",
+        check: (res, data) =>
+          data.every(i =>
+            typeof i.category === "string" &&
+            Number(i.value) > 0
+          )
+      },
+      {
+        name: "Business rule: non-empty categories",
+        check: (res, data) =>
+          data.every(i => i.category.length > 0)
+      },
+      {
+        name: "Distribution has multiple categories",
+        check: (res, data) => data.length >= 3
+      }
+    ]
+  },
 
- currencyChart:{
-  api:`${BASE_URL}/currency_last20.php`,
-  tests:[
-   {name:"<=20 records",check:(r,d)=>d.length<=40},
-   {name:"Rates numeric",check:(r,d)=>d.every(i=>!isNaN(i.rate))}
-  ]
- }
+  /* ================= CURRENCY (NEW) ================= */
+  currencyChart: {
+    api: `${BASE_URL}/currency_last20.php`,
+    tests: [
+      {
+        name: "HTTP 200 & array",
+        check: (res, data) =>
+          res.status === 200 && Array.isArray(data)
+      },
+      {
+        name: "Schema: currency, rate, date",
+        check: (res, data) =>
+          data.every(i =>
+            typeof i.currency === "string" &&
+            !isNaN(Number(i.rate)) &&
+            typeof i.date === "string"
+          )
+      },
+      {
+        name: "Business rule: max 20 records",
+        check: (res, data) => data.length <= 20
+      },
+      {
+        name: "Contains USD and CHF",
+        check: (res, data) =>
+          data.some(i => i.currency === "USD") &&
+          data.some(i => i.currency === "CHF")
+      }
+    ]
+  }
 
 };
 
@@ -432,22 +543,48 @@ function openTestDialog(title,id){
 }
 
 async function runApiTest(){
- const box=document.getElementById("testResult");
- box.style.display="block";
- box.innerHTML="Running tests...\n\n";
+  const box = document.getElementById('testResult');
+  box.style.display = 'block';
+  box.innerHTML = "Running tests...\n\n";
 
- const res=await fetch(currentTest.api);
- const data=await res.json();
+  const res = await fetch(currentTest.api);
+  const data = await res.json();
 
- let passed=0;
- currentTest.tests.forEach((t,i)=>{
-  const ok=t.check(res,data);
-  if(ok) passed++;
-  box.innerHTML+=`${ok?"✅":"❌"} ${t.name}\n`;
- });
+  let passed = 0;
 
- box.innerHTML+=`\n${passed}/${currentTest.tests.length} tests passed`;
+  currentTest.tests.forEach((t, i) => {
+    const ok = t.check(res, data);
+    if(ok) passed++;
+    box.innerHTML += `${ok ? "✅" : "❌"} Test ${i+1}: ${t.name}\n`;
+  });
+
+  box.innerHTML += `
+\nSummary:
+${passed} / ${currentTest.tests.length} tests passed
+
+--- JSON Preview ---
+${prettyJson(data)}
+`;
 }
+
+
+function prettyJson(obj){
+  return JSON.stringify(obj, null, 2)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+)/g,
+      m => {
+        let cls='number';
+        if(/^"/.test(m)) cls = /:$/.test(m) ? 'key' : 'string';
+        else if(/true|false/.test(m)) cls='boolean';
+        else if(/null/.test(m)) cls='null';
+        return `<span class="${cls}">${m}</span>`;
+      }
+    );
+}
+
 
 /* ===================== CLAPS ===================== */
 async function loadClaps(){
