@@ -241,12 +241,14 @@ footer{
 
 <body class="d-flex flex-column min-vh-100">
 
-<button id="themeBtn"
- class="btn btn-sm btn-outline-secondary position-fixed end-0 m-3"
- onclick="toggleTheme()">🌙 Dark</button>
-    
-<button class="btn btn-sm btn-outline-primary"
-    onclick="openDoc()">📘 Doc</button>   
+<div class="position-fixed end-0 m-3 d-flex flex-column gap-2">
+  <button id="themeBtn"
+    class="btn btn-sm btn-outline-secondary"
+    onclick="toggleTheme()">🌙 Dark</button>
+
+  <button class="btn btn-sm btn-outline-primary"
+    onclick="openDoc()">📘 Doc </button>
+</div>
 
 <div class="container py-5 flex-grow-1">
 
