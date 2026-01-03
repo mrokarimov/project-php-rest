@@ -50,18 +50,29 @@ $trafficValues = array_map('intval',array_column($trafficData,'value'));
 $productLabels = array_column($productData,'category');
 $productValues = array_map('intval',array_column($productData,'value'));
 
-$allRates = array_merge($usdY, $chfY);
-
 $yMin = min($allRates) - 0.01;
 $yMax = max($allRates) + 0.01;
 
 
 /* ===================== CURRENCY PREP ===================== */
-$usdTimes  = array_column($usd['rates'] ?? [], 'effectiveDate');
-$usdRates  = array_column($usd['rates'] ?? [], 'mid');
+$usdRates = is_array($usd['rates'] ?? null)
+    ? array_column($usd['rates'], 'mid')
+    : [];
 
-$chfTimes = array_column($chf['rates'] ?? [], 'effectiveDate');
-$chfRates = array_column($chf['rates'] ?? [], 'mid');
+$usdTimes = is_array($usd['rates'] ?? null)
+    ? array_column($usd['rates'], 'effectiveDate')
+    : [];
+
+$chfRates = is_array($chf['rates'] ?? null)
+    ? array_column($chf['rates'], 'mid')
+    : [];
+
+$chfTimes = is_array($chf['rates'] ?? null)
+    ? array_column($chf['rates'], 'effectiveDate')
+    : [];
+
+$allRates = array_merge($usdRates, $chfRates);
+
 
 /* ===================== CURRENCY TABLE ===================== */
 $currencyData = [];
@@ -533,44 +544,34 @@ function drawCharts(){
  );
 
  /* CURRENCY */
-Plotly.newPlot(
- 'currencyChart',
- [
+Plotly.newPlot('currencyChart', [
   {
-   x:<?=json_encode($usdX)?>,
-   y:<?=json_encode($usdY)?>,
-   mode:'lines+markers',
-   name:'USD → PLN',
-   line:{width:3},
-   marker:{size:6}
+    x: <?= json_encode($usdTimes) ?>,
+    y: <?= json_encode($usdRates) ?>,
+    mode: 'lines+markers',
+    name: 'USD → PLN',
+    line: { width: 3 }
   },
   {
-   x:<?=json_encode($chfX)?>,
-   y:<?=json_encode($chfY)?>,
-   mode:'lines+markers',
-   name:'CHF → PLN',
-   line:{width:3},
-   marker:{size:6}
+    x: <?= json_encode($chfTimes) ?>,
+    y: <?= json_encode($chfRates) ?>,
+    mode: 'lines+markers',
+    name: 'CHF → PLN',
+    line: { width: 3 }
   }
- ],
- {
-  paper_bgcolor:'transparent',
-  plot_bgcolor:'transparent',
-  font:{color:fontColor},
-  margin:{t:50,l:50,r:30,b:50},
-  yaxis:{
-    range:[<?=$yMin?>,<?=$yMax?>],
-    gridcolor:'rgba(0,0,0,0.08)',
-    zeroline:false
-  },
-  xaxis:{
-    showgrid:true,
-    gridcolor:'rgba(0,0,0,0.05)'
-  },
-  legend:{orientation:'h',y:-0.2}
- },
- cfg
-);
+], {
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
+  margin: { t: 50 },
+  yaxis: {
+    autorange: true,
+    fixedrange: false
+  }
+}, {
+  displayModeBar: false,
+  responsive: true
+});
+
 
 
 /* ===================== THEME ===================== */
