@@ -228,12 +228,34 @@ footer{
  border-top:1px solid rgba(0,0,0,.1)
 }
 
-/* JSON colors */
-.string{color:#22c55e}
-.number{color:#38bdf8}
-.boolean{color:#facc15}
-.null{color:#fb7185}
-.key{color:#e879f9}
+/* ===== JSON SYNTAX HIGHLIGHT (LIGHT + DARK SAFE) ===== */
+
+.json-key {
+  color: #22c55e; /* yashil – key */
+}
+
+.json-string {
+  color: #ef4444; /* qizil – string */
+}
+
+.json-number {
+  color: #38bdf8; /* ko‘k – number */
+}
+
+.json-boolean {
+  color: #facc15; /* sariq */
+}
+
+.json-null {
+  color: #fb7185; /* pushti */
+}
+
+/* curly braces */
+.json-brace {
+  color: #16a34a;
+  font-weight: 600;
+}
+
 
     
 </style>
@@ -255,7 +277,7 @@ footer{
 <div class="text-center mb-4">
 <h2><b>Enterprise Analytics Dashboard</b></h2>
 <p class="text-muted">
-<b>Php • PostgreSQL • Render.com • Plotly API • NBP API</b><br>
+<b>PhP • PostgreSQL • Render.com • Plotly API • NBP API</b><br>
 Last updated: <?=$lastUpdate?>
 </p>
 </div>
@@ -829,27 +851,39 @@ ${prettyJson(data)}
 }
 
 
-function prettyJson(obj){
-  const json = JSON.stringify(obj, null, 2);
+function prettyJson(obj) {
+  let json = JSON.stringify(obj, null, 2)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
   return json.replace(
-    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
-    match => {
+    /({|}|\[|\])|("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
+    (match, brace) => {
+
+      if (brace) {
+        return `<span class="json-brace">${match}</span>`;
+      }
+
       if (/^"/.test(match)) {
         return /:$/.test(match)
           ? `<span class="json-key">${match}</span>`
           : `<span class="json-string">${match}</span>`;
       }
+
       if (/true|false/.test(match)) {
         return `<span class="json-boolean">${match}</span>`;
       }
+
       if (/null/.test(match)) {
         return `<span class="json-null">${match}</span>`;
       }
+
       return `<span class="json-number">${match}</span>`;
     }
   );
 }
+
 
 
     
