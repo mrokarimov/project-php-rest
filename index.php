@@ -386,7 +386,7 @@ foreach($charts as $c):
 <section class="mb-4">
   <h6> - Author</h6>
   <p>
-    <strong>Ozodbek Karimov</strong><br>
+    Name: <strong>Ozodbek Karimov</strong><br>
     Student ID: <strong>69019</strong><br>
     Role: <strong>Software Engineer (Android/Backend)</strong>
   </p>
