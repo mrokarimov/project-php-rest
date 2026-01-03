@@ -135,6 +135,14 @@ $lastUpdate = date("d M Y, H:i");
 body.dark{
  --bg:#0f172a; --card:#1e293b; --text:#e5e7eb; --muted:#9ca3af;
 }
+body.dark #testResult{
+  background:#020617;
+}
+body:not(.dark) #testResult{
+  background:#f8fafc;
+  color:#020617;
+}
+
 body{
  background:var(--bg);
  color:var(--text);
@@ -158,6 +166,12 @@ footer{background:var(--card);border-top:1px solid rgba(0,0,0,.1)}
  user-select:none;
  font-size:14px;
 }
+.json-brace { color:#22c55e; }   
+.json-string { color:#ef4444; }
+.json-number { color:#38bdf8; }
+.json-boolean { color:#facc15; }
+.json-null { color:#fb7185; }
+
     
 </style>
 </head>
@@ -379,6 +393,66 @@ const BASE_URL = "https://project-php-rest.onrender.com/api";
 
 const testCases = {
 
+
+    /* ================= USD ================= */
+usdChart: {
+  api: "https://api.nbp.pl/api/exchangerates/rates/a/usd/last/20/?format=json",
+  tests: [
+    {
+      name: "HTTP 200",
+      check: (res, data) => res.status === 200
+    },
+    {
+      name: "Schema: rates[].mid & effectiveDate",
+      check: (res, data) =>
+        Array.isArray(data.rates) &&
+        data.rates.every(r =>
+          typeof r.mid === "number" &&
+          typeof r.effectiveDate === "string"
+        )
+    },
+    {
+      name: "Business rule: max 20 records",
+      check: (res, data) => data.rates.length <= 20
+    },
+    {
+      name: "Financial sanity: rate > 0",
+      check: (res, data) =>
+        data.rates.every(r => r.mid > 0)
+    }
+  ]
+},
+
+/* ================= CHF ================= */
+chfChart: {
+  api: "https://api.nbp.pl/api/exchangerates/rates/a/chf/last/20/?format=json",
+  tests: [
+    {
+      name: "HTTP 200",
+      check: (res, data) => res.status === 200
+    },
+    {
+      name: "Schema: rates[].mid & effectiveDate",
+      check: (res, data) =>
+        Array.isArray(data.rates) &&
+        data.rates.every(r =>
+          typeof r.mid === "number" &&
+          typeof r.effectiveDate === "string"
+        )
+    },
+    {
+      name: "Business rule: max 20 records",
+      check: (res, data) => data.rates.length <= 20
+    },
+    {
+      name: "Financial sanity: rate > 0",
+      check: (res, data) =>
+        data.rates.every(r => r.mid > 0)
+    }
+  ]
+},
+
+
   /* ================= SALES ================= */
   salesChart: {
     api: `${BASE_URL}/sales_monthly.php`,
@@ -572,28 +646,30 @@ ${prettyJson(data)}
 
 
 function prettyJson(obj){
-  return JSON.stringify(obj, null, 2)
+  let json = JSON.stringify(obj, null, 2)
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+)/g,
-      m => {
-        let cls='number';
-        if(/^"/.test(m)) cls = /:$/.test(m) ? 'key' : 'string';
-        else if(/true|false/.test(m)) cls='boolean';
-        else if(/null/.test(m)) cls='null';
-        return `<span class="${cls}">${m}</span>`;
-      }
-    );
+    .replace(/>/g,'&gt;');
+
+  return json
+    .replace(/(\{|\}|\[|\])/g, '<span class="json-brace">$1</span>')
+    .replace(/"(.*?)"/g, '<span class="json-string">"$1"</span>')
+    .replace(/\b\d+(\.\d+)?\b/g, '<span class="json-number">$&</span>')
+    .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
+    .replace(/\bnull\b/g, '<span class="json-null">null</span>');
 }
 
 
+</script>
+
+    
+<script>
 /* ===================== CLAPS ===================== */
+
 async function loadClaps(){
-  const r = await fetch(`${BASE_URL}/get_claps.php`);
+  const r = await fetch(`${BASE_URL}/get_claps.php`, { method: "GET" });
   const j = await r.json();
-  document.getElementById("clapCount").innerText = j.total;
+  document.getElementById("clapCount").innerText = j.claps;
 }
 
 async function addClap(){
@@ -601,8 +677,10 @@ async function addClap(){
   loadClaps();
 }
 
+
 loadClaps();
 </script>
+    
 <script>
 /* ===================== CHART DRAW ===================== */
 
