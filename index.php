@@ -146,6 +146,19 @@ body, body *{color:var(--text)}
 .card{background:var(--card);border:none;border-radius:16px}
 .chart-box{height:460px}
 footer{background:var(--card);border-top:1px solid rgba(0,0,0,.1)}
+.clap-box{
+ display:inline-flex;
+ align-items:center;
+ gap:8px;
+ padding:6px 14px;
+ border-radius:999px;
+ border:1px solid rgba(34,197,94,.6);
+ color:#22c55e;
+ cursor:pointer;
+ user-select:none;
+ font-size:14px;
+}
+    
 </style>
 </head>
 
@@ -590,28 +603,14 @@ function prettyJson(obj){
 async function loadClaps(){
   const r = await fetch(`${BASE_URL}/get_claps.php`);
   const j = await r.json();
-  document.getElementById("clapCount").innerText = j.claps;
+  document.getElementById("clapCount").innerText = j.total;
 }
-
 
 async function addClap(){
-  const box = document.querySelector(".clap-box");
-
-  // animation
-  const float = document.createElement("span");
-  float.className = "clap-float";
-  float.innerText = "+1";
-  box.appendChild(float);
-  setTimeout(() => float.remove(), 700);
-
-  // API call
-  const r = await fetch(`${BASE_URL}/add_clap.php`, {
-    method: "POST"
-  });
-
-  const j = await r.json();
-  document.getElementById("clapCount").innerText = j.claps;
+  await fetch(`${BASE_URL}/add_clap.php`, { method: "POST" });
+  loadClaps();
 }
+
 loadClaps();
 </script>
 <script>
